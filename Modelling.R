@@ -1,6 +1,8 @@
 ## Model SARIMA
 
-library(forecast)
+library(forecast)install.packages("astsa")
+library(astsa)
+
 
 # Create ts object with weekly seasonality
 consumo_ts <- ts(df$CONSUMO, frequency = 7)
@@ -36,3 +38,6 @@ Box.test(residuals(m2), lag = 20, type = "Ljung-Box")
 checkresiduals(auto_model)
 Box.test(residuals(auto_model), lag = 14, type = "Ljung-Box")
 Box.test(residuals(auto_model), lag = 20, type = "Ljung-Box")
+
+sarima(df$CONSUMO, p=1, d=1, q=1, P=1, D=1, Q=1, S=7)
+sarima(df$CONSUMO, p=0, d=0, q=4, P=0, D=1, Q=1, S=7)

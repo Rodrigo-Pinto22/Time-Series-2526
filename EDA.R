@@ -74,6 +74,43 @@ df %>%
   geom_boxplot(fill = "steelblue", alpha = 0.6) +
   labs(title = "Consumption Distribution by Month", y = "Consumption (GWh)", x = "")
 
+
+# Find optimal lambda
+lambda <- BoxCox.lambda(df$CONSUMO)
+lambda
+
+# Plot transformed series
+df$CONSUMO_BC <- BoxCox(df$CONSUMO, lambda)
+
+ggplot(df, aes(x = DATE, y = CONSUMO_BC)) +
+  geom_line(colour = "steelblue") +
+  labs(title = paste0("Box-Cox Transformed Series (λ = ", round(lambda, 3), ")"),
+       y = "Transformed Consumption", x = "")
+
+# Add working day flag
+df <- df %>%
+  mutate(
+    weekday = wday(DATE, week_start = 1),
+    is_workday = ifelse(weekday <= 5, 1, 0)
+  )
+
+# Monthly working day adjustment
+df <- df %>%
+  mutate(month_year = floor_date(DATE, "month")) %>%
+  group_by(month_year) %>%
+  mutate(
+    workdays_in_month = sum(is_workday),
+    CONSUMO_ADJ = CONSUMO / workdays_in_month * 20  # normalise to 20 working days
+  ) %>%
+  ungroup()
+
+# Compare raw vs adjusted
+ggplot(df, aes(x = DATE)) +
+  geom_line(aes(y = CONSUMO, colour = "Raw")) +
+  geom_line(aes(y = CONSUMO_ADJ, colour = "Adjusted")) +
+  labs(title = "Raw vs Working Day Adjusted Consumption",
+       y = "Consumption (GWh)", x = "", colour = "")
+
 ##ACF & PACF
 
 par(mfrow = c(1, 2))
