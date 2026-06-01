@@ -1,0 +1,10 @@
+EDA - eletricidade REN
+
+structure → visual patterns → stationarity → transformations → ACF/PACF.
+
+Package		What it's for
+dplyr		Data manipulation
+ggplot2		Plots
+lubridate	Date handling
+forecast	SARIMA, ETS, ACF/PACF plots
+tseries		ADF/KPSS stationarity tests
