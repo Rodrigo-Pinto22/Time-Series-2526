@@ -2,7 +2,8 @@
 
 library(forecast)install.packages("astsa")
 library(astsa)
-
+install.packages("lmtest")
+library("lmtest")
 
 # Create ts object with weekly seasonality
 consumo_ts <- ts(df$CONSUMO, frequency = 7)
@@ -31,6 +32,8 @@ summary(auto_model)
 AIC(auto_model)
 BIC(auto_model)
 
+summary(m2)
+coeftest(m2)
 checkresiduals(m2)
 Box.test(residuals(m2), lag = 14, type = "Ljung-Box")
 Box.test(residuals(m2), lag = 20, type = "Ljung-Box")
