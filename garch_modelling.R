@@ -88,4 +88,20 @@ sarima(df$CONSUMO, p=1, d=1, q=1, P=1, D=1, Q=1, S=7)
 # Recheck residuals
 ArchTest(residuals(m2_clean), lags = 12)
 
+# Plot de diagnósticos do GJR-GARCH
+gjr_fit_clean <- ugarchfit(spec = garch_spec_gjr, data = residuals(m2_clean))
 
+# Plots de diagnóstico
+par(mfrow = c(2,2))
+
+# 1. Resíduos estandardizados
+plot(gjr_fit_clean, which = 1)
+
+# 2. ACF dos resíduos estandardizados  
+plot(gjr_fit_clean, which = 11)
+
+# 3. Q-Q plot
+plot(gjr_fit_clean, which = 9)
+
+# 4. ACF dos resíduos ao quadrado
+plot(gjr_fit_clean, which = 12)

@@ -44,3 +44,12 @@ Box.test(residuals(auto_model), lag = 20, type = "Ljung-Box")
 
 sarima(df$CONSUMO, p=1, d=1, q=1, P=1, D=1, Q=1, S=7)
 sarima(df$CONSUMO, p=0, d=0, q=4, P=0, D=1, Q=1, S=7)
+
+# Matriz de correlação dos parâmetros do modelo final
+library(forecast)
+
+# Covariância dos parâmetros
+vcov(m2_clean)
+
+# Correlação dos parâmetros
+cov2cor(vcov(m2_clean))
