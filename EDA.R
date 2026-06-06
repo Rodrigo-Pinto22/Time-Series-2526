@@ -14,6 +14,8 @@ library(lubridate)
 library(ggplot2)
 library(dplyr)
 
+dir.create("figs", showWarnings = FALSE)
+
 # Fix date column name
 df <- df %>% rename(DATE = ...1)
 
@@ -37,6 +39,7 @@ ggplot(df, aes(x = DATE, y = CONSUMO)) +
   geom_line(colour = "steelblue") +
   labs(title = "Daily Electricity Consumption - Portugal (REN)",
        y = "Consumption (GWh)", x = "")
+ggsave("figs/daily_consumptio.png", width = 7, height = 4)
 
 # ========= Zoom into a single year to spot weekly patterns =========
 
@@ -45,6 +48,7 @@ df %>%
   ggplot(aes(x = DATE, y = CONSUMO)) +
   geom_line(colour = "steelblue") +
   labs(title = "Daily Electricity Consumption - 2024", y = "Consumption (GWh)", x = "")
+ggsave("figs/daily_consumption_2024.png", width = 7, height = 4)
 
 
 ## 4 - Seasonal exploration — average by day of week and month
@@ -56,6 +60,7 @@ df %>%
   ggplot(aes(x = weekday, y = mean_consumo)) +
   geom_col(fill = "steelblue") +
   labs(title = "Average Consumption by Day of Week", y = "Mean Consumption", x = "")
+ggsave("figs/average_consumption_dayweek.png", width = 7, height = 4)
 
 # Month effect
 df %>%
@@ -65,6 +70,7 @@ df %>%
   ggplot(aes(x = month, y = mean_consumo)) +
   geom_col(fill = "coral") +
   labs(title = "Average Consumption by Month", y = "Mean Consumption", x = "")
+ggsave("figs/average_consumption_month.png", width = 7, height = 4)
 
 ## 5 - Boxplots by month and weekday
 
@@ -73,6 +79,7 @@ df %>%
   ggplot(aes(x = month, y = CONSUMO)) +
   geom_boxplot(fill = "steelblue", alpha = 0.6) +
   labs(title = "Consumption Distribution by Month", y = "Consumption (GWh)", x = "")
+ggsave("figs/distribution_consumption_month.png", width = 7, height = 4)
 
 
 # Find optimal lambda
@@ -113,9 +120,11 @@ ggplot(df, aes(x = DATE)) +
 
 ##ACF & PACF
 
+png("figs/acf_pacf.png", width = 800, height = 400)
 par(mfrow = c(1, 2))
 acf(df$CONSUMO, lag.max = 60, main = "ACF - CONSUMO")
 pacf(df$CONSUMO, lag.max = 60, main = "PACF - CONSUMO")
+dev.off()
 
 ## differencing to achieve stationary
 
@@ -130,9 +139,11 @@ par(mfrow = c(1,1))
 plot(consumo_diff1_7, type = "l", main = "CONSUMO - Seasonal + Regular Differencing", ylab = "")
 
 # ACF and PACF of differenced series
+png("figs/acf_pacf_diff.png", width = 800, height = 400)
 par(mfrow = c(1, 2))
 acf(consumo_diff1_7, lag.max = 60, main = "ACF - Differenced")
 pacf(consumo_diff1_7, lag.max = 60, main = "PACF - Differenced")
+dev.off()
 
 # Stationarity tests on differenced series
 adf.test(consumo_diff1_7)

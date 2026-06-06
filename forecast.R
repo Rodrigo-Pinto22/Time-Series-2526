@@ -25,6 +25,7 @@ autoplot(sarima_forecast) +
   labs(title = "SARIMA(1,1,1)(1,1,1)[7] - 28-day Forecast",
        y = "Consumption (GWh)", x = "") +
   scale_colour_manual(values = c("Actual" = "black"))
+ggsave("figs/sarima_forecast.png", width = 7, height = 4)
 
 
 # Refit GJR-GARCH no training set
@@ -57,15 +58,22 @@ forecast_df <- data.frame(
 
 # Plot SARIMA + GARCH
 ggplot(forecast_df, aes(x = DATE)) +
-  geom_ribbon(aes(ymin = lower_95, ymax = upper_95), 
+  geom_ribbon(aes(ymin = lower_95, ymax = upper_95),
               fill = "steelblue", alpha = 0.2) +
-  geom_ribbon(aes(ymin = lower_80, ymax = upper_80), 
+  geom_ribbon(aes(ymin = lower_80, ymax = upper_80),
               fill = "steelblue", alpha = 0.3) +
   geom_line(aes(y = mean, colour = "Forecast")) +
   geom_line(aes(y = actual, colour = "Actual")) +
   labs(title = "SARIMA + GJR-GARCH - 28-day Forecast",
        y = "Consumption (GWh)", x = "", colour = "") +
   scale_colour_manual(values = c("Actual" = "black", "Forecast" = "steelblue"))
+ggsave("figs/garch_forecast.png", width = 7, height = 4)
+
+ggplot(forecast_df, aes(x = DATE, y = garch_sigma)) +
+  geom_line(colour = "steelblue") +
+  labs(title = "GJR-GARCH(1,1) - Conditional Volatility Forecast",
+       y = "Conditional Std. Dev. (GWh)", x = "")
+ggsave("figs/vol_forecast.png", width = 7, height = 4)
 
 
 # Função auxiliar
@@ -103,3 +111,4 @@ autoplot(sarima_boot) +
   autolayer(ts(test$CONSUMO, frequency = 7), series = "Actual") +
   labs(title = "SARIMA - Bootstrap Forecast Intervals",
        y = "Consumption (GWh)", x = "")
+ggsave("figs/boot_forecast.png", width = 7, height = 4)

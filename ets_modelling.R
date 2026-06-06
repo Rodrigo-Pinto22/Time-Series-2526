@@ -4,7 +4,10 @@ consumo_ts_clean <- ts(df_clean$CONSUMO, frequency = 7)
 
 ets_fit <- ets(consumo_ts_clean)
 summary(ets_fit)
+
+png("figs/ets_diag.png", width = 800, height = 600)
 checkresiduals(ets_fit)
+dev.off()
 
 
 n_test   <- 28
@@ -21,6 +24,7 @@ autoplot(ets_fc) +
   labs(title = paste0("ETS(", ets_train$method, ") - 28-day Forecast"),
        y = "Consumption (GWh)", x = "") +
   scale_colour_manual(values = c("Actual" = "black"))
+ggsave("figs/ets_forecast.png", width = 7, height = 4)
 
 
 ets_mean <- as.numeric(ets_fc$mean)

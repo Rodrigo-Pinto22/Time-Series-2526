@@ -1,10 +1,10 @@
-install.packages("mvtnorm")
+#install.packages("mvtnorm")
 library(mvtnorm)
-install.packages("rugarch")
+#install.packages("rugarch")
 library(rugarch)
-install.packages("FinTS")
+#install.packages("FinTS")
 library(FinTS)
-install.packages("fGarch")
+#install.packages("fGarch")
 library(fGarch)
 
 
@@ -13,6 +13,11 @@ m2 <- Arima(consumo_ts, order = c(1,1,1), seasonal = c(1,1,1))
 summary(m2)
 
 ArchTest(residuals(m2), lags = 12)
+
+# Remove the blackout observation and refit SARIMA
+df_clean <- df %>% filter(DATE != as.Date("2025-04-28"))
+consumo_ts_clean <- ts(df_clean$CONSUMO, frequency = 7)
+m2_clean <- Arima(consumo_ts_clean, order=c(1,1,1), seasonal=c(1,1,1))
 
 # Specify GARCH(1,1) with Student-t distribution
 garch_spec <- ugarchspec(
@@ -65,18 +70,14 @@ summary(garch_fit_egarch)
 #Ljung-Box on R still significant — mean structure inherited from SARIMA
 #Ljung-Box on R² still significant — some residual ARCH effects remain
 
-# Remove the blackout observation
-df_clean <- df %>% filter(DATE != as.Date("2025-04-28"))
-
-# Refit SARIMA
-consumo_ts_clean <- ts(df_clean$CONSUMO, frequency = 7)
-m2_clean <- Arima(consumo_ts_clean, order=c(1,1,1), seasonal=c(1,1,1))
 summary(m2_clean)
 coeftest(m2_clean)
 checkresiduals(m2_clean)
 Box.test(residuals(m2_clean), lag = 14, type = "Ljung-Box")
 Box.test(residuals(m2_clean), lag = 20, type = "Ljung-Box")
-sarima(df$CONSUMO, p=1, d=1, q=1, P=1, D=1, Q=1, S=7)
+png("figs/sarima_diagram.png", width = 800, height = 600)
+sarima(df_clean$CONSUMO, p=1, d=1, q=1, P=1, D=1, Q=1, S=7)
+dev.off()
 
 
 # Ljung-Box rejection is likely driven by large sample size (n≈5833) rather than
@@ -92,16 +93,10 @@ ArchTest(residuals(m2_clean), lags = 12)
 gjr_fit_clean <- ugarchfit(spec = garch_spec_gjr, data = residuals(m2_clean))
 
 # Plots de diagnóstico
+png("figs/gjr_diag.png", width = 800, height = 800)
 par(mfrow = c(2,2))
-
-# 1. Resíduos estandardizados
 plot(gjr_fit_clean, which = 1)
-
-# 2. ACF dos resíduos estandardizados  
 plot(gjr_fit_clean, which = 11)
-
-# 3. Q-Q plot
 plot(gjr_fit_clean, which = 9)
-
-# 4. ACF dos resíduos ao quadrado
 plot(gjr_fit_clean, which = 12)
+dev.off()
