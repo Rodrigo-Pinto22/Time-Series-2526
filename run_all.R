@@ -1,0 +1,5 @@
+source("EDA.R")
+source("Modelling.R")
+source("garch_modelling.R")
+source("forecast.R")
+source("ets_modelling.R")
